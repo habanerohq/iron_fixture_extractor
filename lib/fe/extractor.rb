@@ -14,9 +14,9 @@ module Fe
     #
 
     def initialize
-      # This delays the constraint checked to the end of the transaction allowing inserting rows out of order when tables have foreign key to each other. 
-      # Solves also teh issue with truncating when foreign keys are present. 
-      # TODO: adapt this to other databases if needed 
+      # This delays the constraint checked to the end of the transaction allowing inserting rows out of order when tables have foreign key to each other.
+      # Solves also teh issue with truncating when foreign keys are present.
+      # TODO: adapt this to other databases if needed
       ActiveRecord::Base.connection.execute("SET CONSTRAINTS ALL DEFERRED") if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
     end
 
@@ -176,7 +176,7 @@ module Fe
       if @fixture_hashes.nil?
         @fixture_hashes = {}
       end
-      if @fixture_hashes.has_key?(model_name) 
+      if @fixture_hashes.has_key?(model_name)
         @fixture_hashes[model_name]
       else
         @fixture_hashes[model_name] = YAML.load_file(self.fixture_path_for_model(model_name))
@@ -192,14 +192,14 @@ module Fe
     # * These are used by the Fe module to setup the Extractor object
     # This is called from 2 types of invocations
     #   Fe.extract('Post.all', :name => :bla)
-    #   or 
+    #   or
     #   Fe.extract('[Post.all,Comment.all]', :name => :bla2)
-    #   
+    #
     def load_from_args(active_relation_or_array,*args)
       options = args.extract_options!
       @name = (options[:name] || Time.now.strftime("%Y_%m_%d_%H_%M_%S")).to_sym
       if active_relation_or_array.kind_of? String
-        @extract_code = active_relation_or_array 
+        @extract_code = active_relation_or_array
       else
         raise "Extract code must be a string, so .rebuild can be called"
       end
@@ -234,7 +234,7 @@ module Fe
       @output_hash[key].add(record)
       record.association_cache.each_pair do |assoc_name,association_def|
         Array(association_def.target).each do |a|
-          self.recurse(a)  
+          self.recurse(a)
         end
       end
     end
@@ -252,7 +252,7 @@ module Fe
             fixture_name = "r#{Array(record.id).join('_')}"
             hash[fixture_name] = record.attributes
             # dump serialized attributes
-            record.serialized_attributes.each do |attr, serializer|
+            record.class.serialized_attributes.each do |attr, serializer|
               hash[fixture_name][attr] = serializer.dump(hash[fixture_name][attr])
             end
             hash
